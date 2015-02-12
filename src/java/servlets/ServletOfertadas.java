@@ -80,7 +80,7 @@ public class ServletOfertadas extends HttpServlet {
                                         out.println("matricula inválida");
                                     }
                                     else{
-                        
+                        //a merda ta sendo aqui em cima
                                 out.println("<table border=2><tr>");
                                 out.println("<td><b>Matrícula</b></td> <td><b>Nome do Aluno</b></td></tr>") ;
                                 mat_aluno=rec.getString(2);
