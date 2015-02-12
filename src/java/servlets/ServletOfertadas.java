@@ -5,7 +5,6 @@ package servlets;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -25,7 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(urlPatterns = {"/ServletOfertadas"})
 public class ServletOfertadas extends HttpServlet {
-    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";        
+
+    static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     static final String DATABASE_URL = "jdbc:mysql://localhost:3306/lista1";
 
     /**
@@ -40,92 +40,80 @@ public class ServletOfertadas extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+
         Connection conn;
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Turmas Ofertadas</title>"); 
-            out.println("<style type=\"text/css\">" +
-                "<!-- " +
-                "body {background-color:beige; color:black; font-size:90%}"+
-                "td   {font-size: 90%; background-color:white; color: black}" +
-                "//--></style>");
+            out.println("<title>Turmas Ofertadas</title>");
+            out.println("<style type=\"text/css\">"
+                    + "<!-- "
+                    + "body {background-color:beige; color:black; font-size:90%}"
+                    + "td   {font-size: 90%; background-color:white; color: black}"
+                    + "//--></style>");
             out.println("</head>");
             out.println("<body>");
-            String mat_aluno="";
-            String nome_aluno="";
-            
+            String mat_aluno = "";
+            String nome_aluno = "";
+
             try {
-	            Class.forName( JDBC_DRIVER );
-	            conn = DriverManager.getConnection( DATABASE_URL, 
-                            "root", "" );
-                    String matricula = request.getParameter("matricula");
-                    
-                    
+                Class.forName(JDBC_DRIVER);
+                conn = DriverManager.getConnection(DATABASE_URL,
+                        "root", "");
+                String matricula = request.getParameter("matricula");
+
                 try (Statement st = conn.createStatement()) {
-                     ResultSet rec= st.executeQuery(
-                            
-                            "SELECT * " +
-                                    "FROM alunos " +
-                                    "WHERE " +
-                                    ("matricula='" + matricula + "'"));
-                                    rec.next();
-                                   matricula= rec.getString("matricula");
-                                    if (matricula.equals(""))
-                                    {
-                                        
-                                        out.println("matricula inválida");
-                                    }
-                                    else{
+                    ResultSet rec = st.executeQuery(
+                            "SELECT * "
+                            + "FROM alunos "
+                            + "WHERE "
+                            + ("matricula='" + matricula + "'"));
+                    if (!rec.next()) {
+                        out.println("Matricula inválida!");
+                    } else {
                         //a merda ta sendo aqui em cima
-                                out.println("<table border=2><tr>");
-                                out.println("<td><b>Matrícula</b></td> <td><b>Nome do Aluno</b></td></tr>") ;
-                                mat_aluno=rec.getString(2);
-                                nome_aluno=rec.getString(1);
-                                out.println("<tr><td>"+ mat_aluno + "</td>" +  "<td>" + nome_aluno + "</td></tr>"); 
-                    
-                                out.println("</table>");
-                       
-                                    }
+                        out.println("<table border=2><tr>");
+                        out.println("<td><b>Matrícula</b></td> <td><b>Nome do Aluno</b></td></tr>");
+                        mat_aluno = rec.getString(2);
+                        nome_aluno = rec.getString(1);
+                        out.println("<tr><td>" + mat_aluno + "</td>" + "<td>" + nome_aluno + "</td></tr>");
+
+                        out.println("</table>");
+
                         out.println("<h2>Disciplinas disponíveis abaixo </h2>");
-                        ResultSet rec2= st.executeQuery(
-                            "SELECT * " +
-                            "FROM turmas_ofertadas " );
+                        ResultSet rec2 = st.executeQuery(
+                                "SELECT * "
+                                + "FROM turmas_ofertadas ");
                         out.println("<br />");
-                
-                out.println("<form action=SolicitacaoMatricula method=get name=solicitadas>");
-                
-                out.println("<table border=1><tr>");
-                out.println("<td><b>Código da disciplina</b></td> <td><b>Código da turma</b></td><td><b>Horário</b></td><td><b>Incluir</b></td></tr>") ;
-                while(rec2.next())
-                    {
-                         out.println("<tr><td>" + rec2.getString(1) + "</td>" +  "<td>" + rec2.getString(2) + "</td>"+  "<td>" + rec2.getString(3) +"</td>"+ "<td> <input type=checkbox name=codigo value=" +rec2.getString(1) +  " </td></tr>");
-                                               
+
+                        out.println("<form action=SolicitacaoMatricula method=get name=solicitadas>");
+
+                        out.println("<table border=1><tr>");
+                        out.println("<td><b>Código da disciplina</b></td> <td><b>Código da turma</b></td><td><b>Horário</b></td><td><b>Incluir</b></td></tr>");
+                        while (rec2.next()) {
+                            out.println("<tr><td>" + rec2.getString(1) + "</td>" + "<td>" + rec2.getString(2) + "</td>" + "<td>" + rec2.getString(3) + "</td>" + "<td> <input type=checkbox name=codigo value=" + rec2.getString(1) + " </td></tr>");
+
+                        }
+
+                        out.println("</table>");
+
+                        out.println("<input type='hidden' name='matricula' value='" + mat_aluno + "'> ");
+                        out.println("<input type='hidden' name='aluno'value='" + nome_aluno + "' >");
+                        out.println("<input type='submit' value='Enviar' name='btnSolicitar' >");
+                        out.println("</form>");
                     }
-                                                
-                out.println("</table>");
-                
-                
-                out.println("<input type='hidden' name='matricula' value='" + mat_aluno + "'> ");
-                out.println("<input type='hidden' name='aluno'value='" + nome_aluno + "' >");
-                out.println("<input type='submit' value='Enviar' name='btnSolicitar' >");
-                out.println("</form>");
                 }
-                    
-                   
+
+            } catch (SQLException s) {
+                out.println("SQL Error: " + s.toString() + " "
+                        + s.getErrorCode() + " " + s.getSQLState());
+            } catch (ClassNotFoundException e) {
+                out.println("Error: " + e.toString()
+                        + e.getMessage());
             }
-            catch (SQLException s) {
-	            out.println("SQL Error: " + s.toString() + " "
-	                + s.getErrorCode() + " " + s.getSQLState());
-	        } catch (ClassNotFoundException e) {
-	            out.println("Error: " + e.toString()
-	                + e.getMessage());
-	        }
-                        
-            
+
             out.println("</body>");
             out.println("</html>");
         }
